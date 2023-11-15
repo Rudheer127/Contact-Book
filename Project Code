@@ -1,0 +1,158 @@
+import mysql.connector as m
+from prettytable import PrettyTable as p
+con=m.connect (host='localhost',user='root',password='student')
+cur=con.cursor()
+query='create database if not exists Contact_Book'
+cur.execute (query)
+query='use Contact_Book'
+cur.execute(query)
+query='create table if not exists Contacts(Contact_name varchar(30) ,contact_number char(10) primary key,email_address varchar(40))'
+cur.execute (query)
+
+#to search fro a existing contact
+def search():
+    name=input('Enter the Contact Name: ')
+    query= "Select * from Contacts where contact_name = '{}'".format(name)
+    cur.execute(query)
+    data =cur.fetchone()
+    if data != None:
+        pretty = p(['CONTACT_NAME','CONTACT_NUMBER','EMAIL_ADDRESS'])
+        pretty.add_row(data)
+        print(pretty)
+    else:
+        print('No Contact found with the name')
+    
+    
+    
+#display the records from table
+def display():
+    query='select * from contacts'
+    cur.execute(query)
+    data=cur.fetchall()
+    a=p(['contact_name','contact_number','email_address'])
+    for i in data:
+        a.add_row(i)
+    print(a)
+
+
+#to add a contact
+def add():
+    name=input('Enter the Contact Name: ')
+    num=input('Enter the Contact Number: ')
+    email=input('Enter the E-mail Address: ')
+    query="insert into contacts values('{}',{},'{}')".format(name,num,email)
+    cur.execute(query)
+    con.commit()
+    print ('The Contact has been added succesfully')
+    query2='select * from contacts where contact_number={}'.format(num)
+    cur.execute(query2)
+    data =cur.fetchone()
+    d = data[0]
+    b = data[1]
+    c = data[2]
+    pretty = p(['CONTACT_NAME','CONTACT_NUMBER','EMAIL_ADDRESS'])
+    pretty.add_row([d,b,c])
+    print(pretty)
+
+
+#to delete a contact
+def delete():
+    display()
+    d=input('Enter the Contact name which you want to delete:').strip()
+    query="select * from contacts where contact_name = '{}'".format(d)
+    cur.execute(query)
+    data = cur.fetchone()
+    if data != None:
+        query = "delete from contacts where contact_name = '{}'".format(d)
+        cur.execute(query)
+        con.commit()
+        print('The Contact has been deleted')
+    else:
+        print('No Contact found with name {}'.format(d))
+    display()
+
+#To edit a existing contact
+def edit():
+    display()
+    update=int(input('Enter the Contact number you want to update or edit:'))
+    print('1.Contact_Name\n2.Email_Address')
+    w=int(input("Enter the Choice:"))
+    if w==1:
+          name = input("Enter the new name you want to update: ")
+          query="update contacts set contact_name = '{}' where contact_number = {}".format(name,update)
+          cur.execute(query)
+          con.commit()
+          display()
+    elif w==2:
+            email=input("Enter the Email_Address:")
+            query="update contacts set email_address = '{}' where contact_number = {}".format(email,update)
+            cur.execute(query)
+            con.commit()
+            display()
+    else:
+        print("Invaild Choice Try Again")
+
+def mainmenu():
+    while True:
+        try:
+            print("\t\t\t",'*'*50)
+            print('\t\t\t\t\t    Contact Book')
+            print("\t\t\t",'*'*50,"\n\n")
+            print('#'*25)
+            print('\tMain Menu..')
+            print('#'*25)
+            print('\n1.Search for a existing Contact.')
+            print('2.View all existing Contacts.')
+            print('3.Add a new Contact.')
+            print('4.Delete existing Contact.')
+            print('5.Edit Contact')
+            print('6.Exit')
+            table=int(input('Enter the Designated Option Number to proceed:'))
+            if table==1:
+                search()
+            elif table==3:
+                add()
+            elif table==2:
+                display()
+            elif table==4:
+                delete()
+            elif table==5:
+                edit()
+            elif table==6:
+                print("Thank You and Visit Again")
+                quit()
+            else:
+                print('Enter a Valid Integer input from the given menu!')
+                continue
+         
+                
+            ans = input("\nwould you like to continue(y) or not(N):")
+
+            if ans.lower()=="y":
+                mainmenu()
+            elif ans.lower()=='ans':
+                print("Invalid Input")(ans)
+            else:
+                print('Exiting...')
+                print('Choose Ok to Exit The Program ')
+                print('Choose Cancel To Continue')
+                quit()
+                
+        except:
+            print('Some Error Occured!!!')
+            input('Press Enter')
+            continue
+
+mainmenu()
+
+            
+
+
+
+        
+        
+    
+    
+    
+           
+        
